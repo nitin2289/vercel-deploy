@@ -1,16 +1,22 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import json
+import os
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS
 
 # Load marks data from marks.json
-with open("abc.json", "r") as file:
-    students = json.load(file)
+# Make sure to use the correct relative path for Vercel
+file_path = os.path.join(os.path.dirname(__file__), 'abc.json')
 
-student_marks = {student['name']: student['marks'] for student in students}
-
+# Check if the file exists before loading
+if os.path.exists(file_path):
+    with open(file_path, "r") as file:
+        students = json.load(file)
+    student_marks = {student['name']: student['marks'] for student in students}
+else:
+    student_marks = {}
 
 @app.route("/api", methods=["GET"])
 def get_marks():
@@ -22,6 +28,6 @@ def get_marks():
     
     return jsonify({"marks": marks})
 
-# For local testing
+# For local testing (this won't run in Vercel)
 if __name__ == "__main__":
     app.run(debug=True)
